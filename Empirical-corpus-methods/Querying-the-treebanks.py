@@ -21,13 +21,16 @@ for i in sud_files:                  # reads file of each language one by one
     data_file = open(str(i),'r',encoding='utf-8').read()
     sentences = []
     sentences = parse(data_file)                         # parses the CONLLU format
-    print(lang)        
+    print(lang)
+    sent_id =0
+    results = open("Verb_rate.csv","w")
+    results.write("Sent_id,S_length,Verb_count\n")
+    results.close()
     for sentence in sentences[0:]:
         sent_id+=1
         print(sent_id)
-        if sent_id>1:
-            num_sent += 1
-            tree = nx.DiGraph()                              # An empty directed graph (i.e., edges are uni-directional)
+        if sent_id<5000:
+            tree =   nx.DiGraph()                              # An empty directed graph (i.e., edges are uni-directional)
             for nodeinfo in sentence[0:]:                    # retrieves information of each node from dependency tree in UD format
                 entry=list(nodeinfo.items())
                 if not entry[7][1]=='punct':
@@ -40,5 +43,31 @@ for i in sud_files:                  # reads file of each language one by one
                     if tree.has_node(tree.nodes[nodex]['head']):                                         # to handle disjoint trees
                         tree.add_edge(tree.nodes[nodex]['head'],nodex,drel=tree.nodes[nodex]['deprel'])       # adds edges as relation between nodes
 
-            print(tree.edges)
+            #print(tree.edges)
+
+            s_length = 0
+            verb_count = 0
+            core = []
+            for nodex in tree.nodes:
+                s_length += 1
+                if nodex!=0:
+                    if tree.nodes[nodex]['upostag']=="VERB":
+                        core.append("VERB")
+                        verb_count += 1
+                    if tree.nodes[nodex]['upostag']=="NOUN" and tree.nodes[nodex]['deprel']=="subj" and (tree.nodes[tree.nodes[nodex]['head']]['upostag'] in ["VERB","AUX"]):
+                        core.append("SUBJ")
+                    if tree.nodes[nodex]['upostag']=="NOUN" and tree.nodes[nodex]['deprel']=="comp:obj" and (tree.nodes[tree.nodes[nodex]['head']]['upostag'] in ["VERB","AUX"]):
+                        core.append("dOBJ")
+                    if tree.nodes[nodex]['upostag']=="NOUN" and tree.nodes[nodex]['deprel']=="comp:obl" and (tree.nodes[tree.nodes[nodex]['head']]['upostag'] in ["VERB","AUX"]):
+                        core.append("iOBJ")
+            print(core)
+                        
+                        
+
+            results = open("Verb_rate.csv","a")
+            results.write(str(sent_id)+","+str(s_length)+","+str(verb_count)+"\n")
+            results.close()
+                    
+                    
+            
 
