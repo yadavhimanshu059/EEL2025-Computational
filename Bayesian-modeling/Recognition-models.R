@@ -46,6 +46,13 @@ ggplot(melt(df.post,id="mu"),aes(x=mu,y=value))+
 mu <- sample(seq(from=200,to=500,length=100000))
 delta <- sample(seq(from=0,to=150,length=100000))
 
+likelihood <- rep(NA,100000)
+for(i in 1:100000){
+  likelihood[i] <- 
+    prod(dnorm(x=dat$Tw,mean=mu[i],sd=60))*
+    prod(dnorm(x=dat$Tnw,mean=mu[i]+delta[i],sd=60))
+}
+
 
 library(truncnorm)
 
@@ -62,8 +69,21 @@ library(reshape2)
 dat <- melt(dat,id="X")
 head(dat)
 colnames(dat) <- c("trial","cond","rt")
+dat$cond_c <- ifelse(dat$cond=="Tw",0,1)
 library(brms)
+m1 <-
+  brm(rt~1+cond_c,
+      data=dat,
+      family=gaussian(),
+      prior = c(prior(normal(500,50),class="Intercept"),
+                prior(normal(0,40),class="b"),
+                prior(normal(0,30),class="sigma")),
+      chains = 4)
 
+summary(m1)
+plot(m1)
+post_beta <- posterior_samples(m1)$b_cond_c
+hist(post_beta) 
 
-
+pp_check(m1,ndraws = 100)
 
