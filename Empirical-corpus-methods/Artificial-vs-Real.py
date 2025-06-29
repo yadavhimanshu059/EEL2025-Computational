@@ -59,17 +59,27 @@ for i in sud_files:                  # reads file of each language one by one
 
             if s_length<30:
                 art_tree = nx.DiGraph()
-                node_list = list(tree.nodes())
+                node_list = list(tree.nodes)
                 random.shuffle(node_list)
                 reordered_nodes = node_list
                 
                 for node in reordered_nodes:
-                    art_tree.add_node(node)
-                for node in art_tree_nodes:
-                    art_tree.add_edge(tree.nodes[node]['head'],node)
-                # need to relabel
-                mapping=dict(zip(art_tree.nodes),range(1,(len(art_tree.nodes)+1)))
-                rla = nx.relabel(art_tree,mapping)
+                    if not node==0:
+                        art_tree.add_node(node)
+
+                for node in art_tree.nodes:
+                    if not tree.nodes[node]['head']==0:
+                        art_tree.add_edge(tree.nodes[node]['head'],node)
+
+                mapping=dict(zip(art_tree.nodes,range(1,(len(art_tree.nodes)+1))))
+                rla = nx.relabel_nodes(art_tree,mapping)
+                
+                abstract_root = 1000
+                real_root = next(nx.topological_sort(rla))
+
+                rla.add_node(abstract_root)
+                rla.add_edge(abstract_root, real_root)
+                        
                 print(rla.edges)
                 print(rla.nodes)
                 
