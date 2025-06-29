@@ -20,7 +20,7 @@ results = open("DL-distribution.csv","w")
 results.write("Lang\tSent_id\tS_length\tDependency\tDL\n")
 results.close()
 
-
+DL_art = []
 for i in sud_files:                  # reads file of each language one by one
     lang = str(i).replace("./SUD", "")
     lang=lang.replace("-sud-train.conllu", "")            # lang variable stores the language code
@@ -80,19 +80,24 @@ for i in sud_files:                  # reads file of each language one by one
                 rla.add_node(abstract_root)
                 rla.add_edge(abstract_root, real_root)
                         
-                print(rla.edges)
-                print(rla.nodes)
+                #print(rla.edges)
+                #print(rla.nodes)
                 
+                for edgex in tree.edges:
+                    dl = abs(edgex[0] - edgex[1])
+                    results = open("DL-distribution.csv","a")
+                    results.write(str(lang)+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
+                    results.close()
+                    DL_lang.append(dl)
+                    
+                for edgey in rla.edges:
+                    dl = abs(edgey[0] - edgey[1])
+                    results = open("DL-distribution.csv","a")
+                    results.write("Artificial"+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
+                    results.close()
+                    DL_art.append(dl)
 
-                
-##                for edgex in tree.edges:
-##                    dl = abs(edgex[0] - edgex[1])
-##                    results = open("DL-distribution.csv","a")
-##                    results.write(str(lang)+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
-##                    results.close()
-##                    DL_lang.append(dl)
-
-    print(str(lang)+"\t"+str(sum(DL_lang)/len(DL_lang)))
+    print(str(lang)+"\t"+str(sum(DL_lang)/len(DL_lang))+"\t"+str(sum(DL_art)/len(DL_art)))
                     
 
                     
