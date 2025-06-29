@@ -57,7 +57,7 @@ for i in sud_files:                  # reads file of each language one by one
             verb_count = 0
             core = []
 
-            if s_length<30:
+            if s_length>2 and s_length<30:
                 art_tree = nx.DiGraph()
                 node_list = list(tree.nodes)
                 random.shuffle(node_list)
