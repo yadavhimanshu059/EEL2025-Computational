@@ -14,6 +14,14 @@ for root, dirs, files in os.walk(directory):
 
 print(sud_files)
 
+results = open("Verb_rate.csv","w")
+results.write("Lang,Sent_id,S_length,Verb_count\n")
+results.close()
+
+results2 = open("Constituent_order.csv","w")
+results2.write("Lang,Sent_id,S_length,Order\n")
+results2.close()
+
 for i in sud_files:                  # reads file of each language one by one
     lang = str(i).replace("./SUD", "")
     lang=lang.replace("-sud-train.conllu", "")            # lang variable stores the language code
@@ -23,13 +31,7 @@ for i in sud_files:                  # reads file of each language one by one
     sentences = parse(data_file)                         # parses the CONLLU format
     print(lang)
     sent_id =0
-    results = open("Verb_rate.csv","w")
-    results.write("Sent_id,S_length,Verb_count\n")
-    results.close()
-
-    results2 = open("Constituent_order.csv","a")
-    results2.write("Lang,Sent_id,S_length,Order\n")
-    results2.close()
+    
     for sentence in sentences[0:]:
         sent_id+=1
         print(sent_id)
@@ -58,42 +60,42 @@ for i in sud_files:                  # reads file of each language one by one
                     if (tree.nodes[nodex]['upostag'] in ["VERB","AUX"]) and tree.nodes[nodex]['head']==0:
                         verb_count += 1
                         core.append(["VERB",nodex])
-                        print(tree.nodes[nodex]['form'])
+                        #print(tree.nodes[nodex]['form'])
                         for nodey in nx.descendants(tree,nodex):
                             if tree.nodes[nodey]['head']==nodex and tree.nodes[nodey]['deprel']=="subj" and (tree.nodes[nodey]['upostag'] in ["NOUN","PROPN","PRON"]):
                                 core.append(["nSUBJ",nodey])
-                                print(tree.nodes[nodey]['form'])
+                                #print(tree.nodes[nodey]['form'])
                             if tree.nodes[nodey]['head']==nodex and tree.nodes[nodey]['deprel']=="comp:obj" and (tree.nodes[nodey]['upostag'] in ["NOUN","PROPN","PRON"]):
                                 core.append(["dOBJ",nodey])
-                                print(tree.nodes[nodey]['form'])
+                                #print(tree.nodes[nodey]['form'])
                             if tree.nodes[nodey]['head']==nodex and tree.nodes[nodey]['deprel']=="comp:obl" and (tree.nodes[nodey]['upostag'] in ["NOUN","PROPN","PRON"]):
                                 core.append(["iOBJ",nodey])
-                                print(tree.nodes[nodey]['form'])
+                                #print(tree.nodes[nodey]['form'])
                             if tree.nodes[nodey]['head']==nodex and tree.nodes[nodey]['deprel']=="comp:aux" and tree.nodes[nodey]['upostag']=="VERB":
                                 for nodez in tree.successors(nodey):
                                     if tree.nodes[nodez]['deprel']=="comp:obj" and (tree.nodes[nodez]['upostag'] in ["NOUN","PROPN","PRON"]):
                                         core.append(["dOBJ",nodez])
-                                        print(tree.nodes[nodez]['form'])
+                                        #print(tree.nodes[nodez]['form'])
                                     if tree.nodes[nodez]['deprel']=="comp:obl" and (tree.nodes[nodez]['upostag'] in ["NOUN","PROPN","PRON"]):
                                         core.append(["iOBJ",nodez])
-                                        print(tree.nodes[nodez]['form'])
+                                        #print(tree.nodes[nodez]['form'])
                             if tree.nodes[nodey]['head']==nodex and tree.nodes[nodey]['deprel']=="comp:aux" and tree.nodes[nodey]['upostag']=="AUX":
                                 for nodev in tree.successors(nodey):
                                     if tree.nodes[nodev]['deprel']=="comp:aux" and tree.nodes[nodev]['upostag']=="VERB":
                                         for nodez in tree.successors(nodev):
                                             if tree.nodes[nodez]['deprel']=="comp:obj" and (tree.nodes[nodez]['upostag'] in ["NOUN","PROPN","PRON"]):
                                                 core.append(["dOBJ",nodez])
-                                                print(tree.nodes[nodez]['form'])
+                                                #print(tree.nodes[nodez]['form'])
                                             if tree.nodes[nodez]['deprel']=="comp:obl" and (tree.nodes[nodez]['upostag'] in ["NOUN","PROPN","PRON"]):
                                                 core.append(["iOBJ",nodez])
-                                                print(tree.nodes[nodez]['form'])
+                                                #print(tree.nodes[nodez]['form'])
             core = sorted(core,key=itemgetter(1))
             order = [arg[0] for arg in core]
             print(order)            
             
 
             results = open("Verb_rate.csv","a")
-            results.write(str(sent_id)+","+str(s_length)+","+str(verb_count)+"\n")
+            results.write(str(lang)+","+str(sent_id)+","+str(s_length)+","+str(verb_count)+"\n")
             results.close()
 
             results2 = open("Constituent_order.csv","a")
