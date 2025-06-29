@@ -85,18 +85,20 @@ for i in sud_files:                  # reads file of each language one by one
                 #print(rla.nodes)
                 
                 for edgex in tree.edges:
-                    dl = abs(edgex[0] - edgex[1])
-                    results = open("DL-distribution.csv","a")
-                    results.write(str(lang)+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
-                    results.close()
-                    DL_lang.append(dl)
+                    if not edgex[0]==0:
+                        dl = abs(edgex[0] - edgex[1])
+                        results = open("DL-distribution.csv","a")
+                        results.write(str(lang)+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
+                        results.close()
+                        DL_lang.append(dl)
                     
                 for edgey in rla.edges:
-                    dl = abs(edgey[0] - edgey[1])
-                    results = open("DL-distribution.csv","a")
-                    results.write("Artificial"+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
-                    results.close()
-                    DL_art.append(dl)
+                    if not edgey[0]==1000:
+                        dl = abs(edgey[0] - edgey[1])
+                        results = open("DL-distribution.csv","a")
+                        results.write("Artificial"+"\t"+str(sent_id)+"\t"+str(s_length)+"\t"+str(edgex)+"\t"+str(dl)+"\n")
+                        results.close()
+                        DL_art.append(dl)
 
     print(str(lang)+"\t"+str(sum(DL_lang)/len(DL_lang))+"\t"+str(sum(DL_art)/len(DL_art)))
                     
