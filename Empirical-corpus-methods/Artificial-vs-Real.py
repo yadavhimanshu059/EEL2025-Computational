@@ -68,8 +68,9 @@ for i in sud_files:                  # reads file of each language one by one
                         art_tree.add_node(node)
 
                 for node in art_tree.nodes:
-                    if not tree.nodes[node]['head']==0:
-                        art_tree.add_edge(tree.nodes[node]['head'],node)
+                    if tree.has_node(tree.nodes[node]['head']):
+                        if not tree.nodes[node]['head']==0:
+                            art_tree.add_edge(tree.nodes[node]['head'],node)
 
                 mapping=dict(zip(art_tree.nodes,range(1,(len(art_tree.nodes)+1))))
                 rla = nx.relabel_nodes(art_tree,mapping)
